@@ -109,7 +109,7 @@ router.get("/log", async (req, res) => {
   const deviceType = parser.getDevice().type || "Unknown";
   const browser = parser.getBrowser().name || "Unknown";
   const os = parser.getOS().name || "Unknown";
-  if (ip == "::1" || ip == "::ffff:127.0.0.1") return;
+  if (ip == "::1" || ip == "::ffff:127.0.0.1") return res.send('concel');
   const insertQuery = `
         INSERT INTO logs (ip_address, country, city, device_type, browser, os)
         VALUES (?, ?, ?, ?, ?, ?)
