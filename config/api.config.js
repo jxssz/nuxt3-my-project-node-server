@@ -16,7 +16,9 @@ const BASE = "/api";
 // const BASE = ''
 
 function Route(app) {
-  app.use(express.json());
+  // 增加限制
+  app.use(express.json({ limit: "50mb" }));
+  app.use(express.urlencoded({ limit: "50mb", extended: true }));
   // app.use(BASE + '/', indexRouter);
   app.use(BASE, users);
   app.use(BASE, datas);

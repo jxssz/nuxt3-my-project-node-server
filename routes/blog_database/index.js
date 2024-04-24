@@ -5,7 +5,7 @@ const UAParser = require("ua-parser-js");
 
 // 获取所有文章
 router.get("/posts", (req, res) => {
-  const query = "SELECT * FROM posts";
+  const query = "SELECT id,title,description,view,updated_at FROM posts";
   bdsql(query)
     .then((data) => {
       res.send(data);
@@ -43,6 +43,9 @@ router.post("/save", (req, res) => {
   const { title, content, author_id, description } = req.body;
   //   res.send(req);
   //   console.log(title, content, author_id);
+  if (!title) {
+    return res.send({ status: 500, message: "名称不能为空", result: null });
+  }
   const query =
     "INSERT INTO posts (title, content, author_id, description, view) VALUES (?, ?, ?, ?, 0)";
   bdsql(query, [title, content, author_id, description])
