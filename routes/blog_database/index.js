@@ -3,6 +3,57 @@ const { bdsql } = require("../../mysql/index.js");
 const geoip = require("geoip-lite");
 const UAParser = require("ua-parser-js");
 
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+
+// 创建上传目录，如果不存在的话
+const staticRoot = path.resolve(__dirname, "../../../nuxt3-my-project-static")
+const uploadDir = path.resolve(__dirname, "../../../nuxt3-my-project-static/img");
+// console.log(uploadDir)
+if (!fs.existsSync(staticRoot)) {
+  fs.mkdirSync(staticRoot);
+}
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+}
+// 更改目录权限为755
+fs.chmod(uploadDir, 0o755, (err) => {
+  if (err) {
+    console.error("更改目录权限时出错:", err);
+  } else {
+    console.log("目录权限已更改为755");
+  }
+});
+// 配置 Multer 中间件，设置文件上传的目录和文件名
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    cb(
+      null,
+      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
+    );
+  },
+});
+// 检查文件类型，确保只接受 WebP 格式的图片
+const fileFilter = function (req, file, cb) {
+  if (file.mimetype === "image/webp") {
+    cb(null, true);
+  } else {
+    cb(new Error("仅支持上传 WebP 格式的图片"), false);
+  }
+};
+
+// 配置 Multer 中间件
+const upload = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+});
+
+// ---------------------------------------------------------------------------------------
+
 // 获取所有文章
 router.get("/posts", (req, res) => {
   const query = "SELECT id,title,description,view,updated_at FROM posts";
@@ -126,4 +177,17 @@ router.get("/log", async (req, res) => {
     });
 });
 
-module.exports = router;
+// 上传图片
+router.post("/upload", upload.single("image"), (req, res) => {
+  console.log("zoul");
+  // 如果文件存在
+  if (req.file) {
+    // 返回上传成功的信息
+    res.status(200).json({ message: "上传成功", file: req.file });
+  } else {
+    // 如果文件不存在，返回错误信息
+    res.status(500).json({ message: "未找到上传的文件" });
+  }
+});
+
+module.exports = { blogRouter: router, uploadDir };

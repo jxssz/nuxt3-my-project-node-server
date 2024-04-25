@@ -10,7 +10,7 @@ var juliSearch = require("../routes/juliSearch"); // https://jucili.com/ 聚磁�
 /**
  * 博客
  */
-var blogDatabase = require("../routes/blog_database");
+var { blogRouter, uploadDir } = require("../routes/blog_database");
 
 const BASE = "/api";
 // const BASE = ''
@@ -19,6 +19,8 @@ function Route(app) {
   // 增加限制
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
+  app.use("/uploads", express.static(uploadDir));
+  // console.log(__dirname + '/uploads')
   // app.use(BASE + '/', indexRouter);
   app.use(BASE, users);
   app.use(BASE, datas);
@@ -30,7 +32,7 @@ function Route(app) {
   /**
    * 博客
    */
-  app.use(BASE, blogDatabase);
+  app.use(BASE, blogRouter);
 }
 
 module.exports = Route;
