@@ -114,6 +114,7 @@ function blogDatabase() {
     debug: false,
     useConnectionPooling: true,
     multipleStatements: true,
+    charset: "utf8mb4",
   };
 
   blog_database = mysql.createConnection(config);
@@ -157,7 +158,7 @@ function bdsql(sql, param) {
   return new Promise((resolve, reject) => {
     blog_database.ping(function (err) {
       if (err) {
-        console.log(err, 'ping 不通！')
+        console.log(err, "ping 不通！");
         blogDatabase();
       }
 
